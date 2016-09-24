@@ -91,14 +91,14 @@ public class SunLight  {
         {
             minutsNow = m_hourInMinuts * (hour - m_sunRiseTime) + m_dayTime.Minute();
             x = minutsNow / (m_morningMinuts1);
-            m_lightIntensity = (m_morninglightIntensity) * x + m_lightIntensityAtNight;
+            m_lightIntensity = (m_morninglightIntensity - m_lightIntensityAtNight) * x + m_lightIntensityAtNight;
             m_sunAngle = 90 * minutsNow / (m_morningMinuts1 + m_morningMinuts2);
             //Debug.Log("morning time ,x = " + x + ", m_light.intensity="+ m_light.intensity+ ", m_morninglightIntensity="+ m_morninglightIntensity);
         }
         else if (hour >= m_morningPoint && hour < 12)
         {
             minutsNow = m_hourInMinuts * (hour - m_sunRiseTime) + m_dayTime.Minute();
-            x = minutsNow / (m_morningMinuts1 + m_morningMinuts2);
+            x = minutsNow / ((12 - m_sunRiseTime) * m_hourInMinuts);
             y = -0.3f * (x - 1) * (x - 1) + 1;
             m_lightIntensity = (m_lightIntensityAtMidDay - m_lightIntensityAtNight) * y + m_lightIntensityAtNight;
             m_sunAngle = 90 * x;
