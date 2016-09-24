@@ -72,6 +72,12 @@ public class Env : MonoBehaviour {
         m_sunLight.SunLightIntensity();
 
         //
-        m_light.intensity = m_sunLight.LightPower();
+        m_light.intensity = m_sunLight.LightIntensity();
+
+        Vector3 vec = new Vector3(m_sunLight.SunAngle(), 45, 0);
+
+        m_light.transform.eulerAngles = vec;
+
+        //Debug.Log(m_sunLight.SunAngle());
     }
 }
