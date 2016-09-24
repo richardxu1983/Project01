@@ -3,34 +3,20 @@ using System.Collections;
 
 public class Movement : MonoBehaviour
 {
-    public float m_speed;
     public float m_camRayLength = 100;
 
-    private Vector3 movement;
-    private Rigidbody m_Rigidbody;
     private Ray m_camRay;
     private int m_floorMask;
-    private Vector3 m_desirdPos;
     private RaycastHit m_floorHit;
-
+    private NavigationAgentComponent m_navigationAgent;
 
     // Use this for initialization
     void Start ()
     {
-        movement = new Vector3(0f,0f,0f);
-        m_Rigidbody = GetComponent<Rigidbody>();
-
+        m_navigationAgent = GetComponent<NavigationAgentComponent>();
+      
         // Create a layer mask for the floor layer.
         m_floorMask = LayerMask.GetMask("Ground");
-
-        //
-        m_desirdPos = transform.position;
-    }
-	
-    //
-    void Awake()
-    {
-        m_desirdPos = transform.position;
     }
 
 
@@ -39,13 +25,7 @@ public class Movement : MonoBehaviour
     {
         GetInput();
     }
-
-    //
-    private void FixedUpdate()
-    {
-        Move();
-    }
-
+    
     //
     private void GetInput()
     {
@@ -60,20 +40,12 @@ public class Movement : MonoBehaviour
             if (Physics.Raycast(m_camRay, out m_floorHit, m_camRayLength, m_floorMask))
             {
                 // Create a vector from the player to the point on the floor the raycast from the mouse hit.
-                m_desirdPos = m_floorHit.point;
+                if (null != m_navigationAgent)
+                {
+                    m_navigationAgent.MoveToPosition(m_floorHit.point, 0.2f);
+                }
             }
         }
     }
 
-    //
-    private void Move()
-    {
-        movement.Normalize();
-        movement = movement * m_speed * Time.deltaTime;
-
-        if(m_desirdPos != transform.position)
-        {
-            m_Rigidbody.MovePosition(m_desirdPos);
-        }
-    }
 }
