@@ -2,30 +2,31 @@
 
 public class SunLight  {
 
-    public float m_sunRiseTime;       //日出时间
-    public float m_sunSetTime;       //日落时间
-    public float m_morningPoint;     //上午强光照时间
-    public float m_afternoonPoint;     //下午强光照时间
-    public float m_lightIntensityAtNight;   //夜间光照强度
-    public float m_lightIntensityAtMidDay;   //正午光照强度
-    private float m_morningMinuts1;        //上午分钟数
-    private float m_afternoonMinuts1;      //下午分钟数
-    private float m_morningMinuts2;        //上午分钟数
-    private float m_afternoonMinuts2;      //下午分钟数
-    private float m_morninglightIntensity;  //上午光照分界点
-    private float m_afternoonlightIntensity;  //下午光照分界点
+    //用于配置的变量，之后会与天气、季节、温度等关联
+    public float m_sunRiseTime;                 //日出时间
+    public float m_sunSetTime;                  //日落时间
+    public float m_lightIntensityAtNight;       //夜间光照强度
+    public float m_lightIntensityAtMidDay;      //正午光照强度
+    private float m_sunDefalutZ = 5;            //将来与纬度有关
+
+    //计算中的变量
+    public float m_morningPoint;                //上午强光照时间
+    public float m_afternoonPoint;              //下午强光照时间
+    private float m_morningMinuts1;             //上午分钟数1
+    private float m_afternoonMinuts1;           //下午分钟数1
+    private float m_afternoonMinuts2;           //下午分钟数2
+    private float m_morninglightIntensity;      //上午光照分界点强度
+    private float m_afternoonlightIntensity;    //下午光照分界点强度
     private float m_x = 0f;
     private float m_y = 0f;
     private float m_lightIntensity;
     private float m_lightPower;
     private float m_sunAngle;
-    private float m_hourInMinuts = 60;     //多少游戏分钟是游戏1小时
-    private float m_totalNightMinutes;     //夜晚一共多少分钟
-    private float m_totalDayMinutes;     //夜晚一共多少分钟
-    private GameDayTime m_dayTime;      //游戏时间类
+    private float m_hourInMinuts;               //多少游戏分钟是游戏1小时
+    private float m_totalDayMinutes;            //夜晚一共多少分钟
 
-    private float m_sunDefalutZ = 5;
-    private Vector3 m_sunPos;
+    private GameDayTime m_dayTime;              //游戏时间类
+    private Vector3 m_sunPos;                   //太阳的位置
 
 
     public SunLight(float sunRiseTime, float sunSetTime, float morningPoint, float afternoonPoint, float lightIntencityAtNight, float lightIntencityAtMidDay, int hourInMinuts, GameDayTime dayTime)
@@ -47,7 +48,6 @@ public class SunLight  {
         //计算分界点时间分钟数
         m_morningMinuts1 = (m_morningPoint - m_sunRiseTime) * m_hourInMinuts;
         m_afternoonMinuts1 = (m_afternoonPoint - 12) * m_hourInMinuts;
-        m_morningMinuts2 = (12 - m_morningPoint) * m_hourInMinuts;
         m_afternoonMinuts2 = (m_sunSetTime - m_afternoonPoint) * m_hourInMinuts;
 
         //计算上午光照分界点强度
@@ -60,7 +60,6 @@ public class SunLight  {
         m_y = -0.3f * (m_x) * (m_x) + 1;
         m_afternoonlightIntensity = (m_lightIntensityAtMidDay - m_lightIntensityAtNight) * m_y + m_lightIntensityAtNight;
 
-        m_totalNightMinutes = ((24 - m_sunSetTime) + (m_sunRiseTime - 0)) * m_hourInMinuts;
         m_totalDayMinutes = (m_sunSetTime - m_sunRiseTime) * m_hourInMinuts;
 
         m_sunAngle = 3.14f * ((m_dayTime.Minute() + m_dayTime.Hour() * m_hourInMinuts)/(m_totalDayMinutes * m_hourInMinuts));

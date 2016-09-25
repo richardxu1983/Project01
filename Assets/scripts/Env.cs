@@ -4,24 +4,26 @@ using UnityEngine.UI;
 
 public class Env : MonoBehaviour {
 
-    
+    //用于配置的变量
     public int m_minInTick;             //多少个逻辑帧过游戏里的1分钟
     public int m_hourInMinuts = 60;     //多少游戏分钟是游戏1小时
     public int m_initHour = 3;          //初始的小时
     public int m_monthInDays = 15;      //一个月多少天
 
-    public float m_sunRiseTime = 5;       //日出时间
-    public float m_sunSetTime = 20;       //日落时间
-    public float m_lightIntensityAtNight = 0.1f;   //夜间光照强度
-    public float m_lightIntensityAtMidDay = 0.75f;   //正午光照强度
+    //用于配置的变量，之后会与天气、季节、温度等关联
+    public float m_sunRiseTime = 5;                     //日出时间
+    public float m_sunSetTime = 20;                     //日落时间
+    public float m_lightIntensityAtNight = 0.1f;        //夜间光照强度
+    public float m_lightIntensityAtMidDay = 0.75f;      //正午光照强度
 
+    //计算用变量
+    private float m_morningPoint = 8;        //上午强光照时间
+    private float m_afternoonPoint = 17;     //下午强光照时间
 
     public Text m_timeInfoText;         //文字控件
     public Light m_light;
 
     private int m_temperature;
-    private float m_morningPoint = 8;     //上午强光照时间
-    private float m_afternoonPoint = 17;     //下午强光照时间
 
     private GameDayTime m_dayTime;      //游戏时间
     private SunLight m_sunLight;        //游戏里的太阳
