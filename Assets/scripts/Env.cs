@@ -12,8 +12,6 @@ public class Env : MonoBehaviour {
 
     public float m_sunRiseTime = 5;       //日出时间
     public float m_sunSetTime = 20;       //日落时间
-    public float m_morningPoint = 10;     //上午强光照时间
-    public float m_afternoonPoint = 16;     //下午强光照时间
     public float m_lightIntensityAtNight = 0.1f;   //夜间光照强度
     public float m_lightIntensityAtMidDay = 0.75f;   //正午光照强度
 
@@ -22,11 +20,11 @@ public class Env : MonoBehaviour {
     public Light m_light;
 
     private int m_temperature;
+    private float m_morningPoint = 8;     //上午强光照时间
+    private float m_afternoonPoint = 17;     //下午强光照时间
 
     private GameDayTime m_dayTime;      //游戏时间
     private SunLight m_sunLight;        //游戏里的太阳
-
-
 
     // Use this for initialization
     void Start ()
@@ -39,6 +37,8 @@ public class Env : MonoBehaviour {
         //太阳
         m_sunLight = new SunLight(m_sunRiseTime, m_sunSetTime, m_morningPoint, m_afternoonPoint, m_lightIntensityAtNight, m_lightIntensityAtMidDay, m_hourInMinuts, m_dayTime);
         m_sunLight.init();
+
+        m_light.intensity = m_sunLight.LightIntensity();
 
         //
         OnChangeMinute();
@@ -69,15 +69,13 @@ public class Env : MonoBehaviour {
         m_timeInfoText.text = m_dayTime.TimeString();
 
         //
-        m_sunLight.SunLightIntensity();
+        //m_sunLight.SunLightIntensity();
+        m_sunLight.SunMove();
 
-        //
-        m_light.intensity = m_sunLight.LightIntensity();
+        m_light.transform.position = (m_sunLight.SunPos());
 
-        Vector3 vec = new Vector3(m_sunLight.SunAngle(), 45, 0);
+        m_light.transform.LookAt(Vector3.zero);
 
-        m_light.transform.eulerAngles = vec;
-
-        //Debug.Log(m_sunLight.SunAngle());
+        //print(m_dayTime.Hour() + "h : "+m_sunLight.LightPower());
     }
 }

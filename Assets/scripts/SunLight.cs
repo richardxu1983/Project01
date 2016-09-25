@@ -1,4 +1,4 @@
-﻿
+﻿using UnityEngine;
 
 public class SunLight  {
 
@@ -16,11 +16,17 @@ public class SunLight  {
     private float m_afternoonlightIntensity;  //下午光照分界点
     private float m_x = 0f;
     private float m_y = 0f;
-    private float m_lightPower;
     private float m_lightIntensity;
+    private float m_lightPower;
     private float m_sunAngle;
-    private int m_hourInMinuts = 60;     //多少游戏分钟是游戏1小时
+    private float m_hourInMinuts = 60;     //多少游戏分钟是游戏1小时
+    private float m_totalNightMinutes;     //夜晚一共多少分钟
+    private float m_totalDayMinutes;     //夜晚一共多少分钟
     private GameDayTime m_dayTime;      //游戏时间类
+
+    private float m_sunDefalutZ = 5;
+    private Vector3 m_sunPos;
+
 
     public SunLight(float sunRiseTime, float sunSetTime, float morningPoint, float afternoonPoint, float lightIntencityAtNight, float lightIntencityAtMidDay, int hourInMinuts, GameDayTime dayTime)
     {
@@ -32,6 +38,8 @@ public class SunLight  {
         m_lightIntensityAtMidDay = lightIntencityAtMidDay;
         m_hourInMinuts = hourInMinuts;
         m_dayTime = dayTime;
+        m_lightIntensity = m_lightIntensityAtMidDay;
+        m_sunPos = new Vector3();
     }
 
     public void init()
@@ -52,12 +60,13 @@ public class SunLight  {
         m_y = -0.3f * (m_x) * (m_x) + 1;
         m_afternoonlightIntensity = (m_lightIntensityAtMidDay - m_lightIntensityAtNight) * m_y + m_lightIntensityAtNight;
 
-    }
+        m_totalNightMinutes = ((24 - m_sunSetTime) + (m_sunRiseTime - 0)) * m_hourInMinuts;
+        m_totalDayMinutes = (m_sunSetTime - m_sunRiseTime) * m_hourInMinuts;
 
-    //
-    public float LightPower()
-    {
-        return m_lightPower;
+        m_sunAngle = 3.14f * ((m_dayTime.Minute() + m_dayTime.Hour() * m_hourInMinuts)/(m_totalDayMinutes * m_hourInMinuts));
+        m_sunPos.z = m_sunDefalutZ;
+        m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
+        m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
     }
 
     //
@@ -66,61 +75,89 @@ public class SunLight  {
         return m_lightIntensity;
     }
 
-    public float SunAngle()
+    public Vector3 SunPos()
     {
-        return m_sunAngle;
+        return m_sunPos;
+    }
+
+    public float LightPower()
+    {
+        return m_lightPower;
+    }
+
+    //
+    public void SunMove()
+    {
+        float hour = m_dayTime.Hour();
+        float minute = m_dayTime.Minute();
+
+        if (hour >= m_sunSetTime && hour < 24)
+        {
+            m_sunAngle = 6.28f * ((minute + (hour - m_sunRiseTime) * m_hourInMinuts) / (24 * m_hourInMinuts));
+
+            //Debug.Log("hour="+ hour+" , angle=" + (minute + hour * m_hourInMinuts) / (m_totalDayMinutes));
+            m_sunPos.z = m_sunDefalutZ;
+            m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
+            m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
+        }
+        else if(hour > 0 && hour < m_sunRiseTime)
+        {
+            m_sunAngle = 6.28f * ((minute + (hour + 24 - m_sunRiseTime) * m_hourInMinuts) / (24 * m_hourInMinuts));
+
+            //Debug.Log("hour="+ hour+" , angle=" + (minute + hour * m_hourInMinuts) / (m_totalDayMinutes));
+            m_sunPos.z = m_sunDefalutZ;
+            m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
+            m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
+        }
+        else if(hour >= m_sunRiseTime && hour < m_sunSetTime)
+        {
+            m_sunAngle = 3.14f * ((minute + (hour- m_sunRiseTime) * m_hourInMinuts) / (m_totalDayMinutes));
+
+            //Debug.Log("hour="+ hour+" , angle=" + (minute + hour * m_hourInMinuts) / (m_totalDayMinutes));
+            m_sunPos.z = m_sunDefalutZ;
+            m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
+            m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
+        }
+
+        SunLightPowerCal();
     }
 
 
     //
-    public void SunLightIntensity()
+    public void SunLightPowerCal()
     {
         int hour = m_dayTime.Hour();
         float minutsNow = 0f;
-        float x;
-        float y;
 
         if (hour >= m_sunSetTime || hour < m_sunRiseTime)
         {
-            m_lightPower = 0;
-            m_sunAngle = 0;
-            m_lightIntensity = m_lightIntensityAtNight;
-            //Debug.Log("night time, m_light.intensity="+ m_light.intensity);
+            m_lightPower = m_lightIntensityAtNight / m_lightIntensityAtMidDay;
         }
         else if (hour >= m_sunRiseTime && hour < m_morningPoint)
         {
             minutsNow = m_hourInMinuts * (hour - m_sunRiseTime) + m_dayTime.Minute();
-            x = minutsNow / (m_morningMinuts1);
-            m_lightIntensity = (m_morninglightIntensity - m_lightIntensityAtNight) * x + m_lightIntensityAtNight;
-            m_sunAngle = 90 * minutsNow / (m_morningMinuts1 + m_morningMinuts2);
-            //Debug.Log("morning time ,x = " + x + ", m_light.intensity="+ m_light.intensity+ ", m_morninglightIntensity="+ m_morninglightIntensity);
+            m_x = minutsNow / (m_morningMinuts1);
+            m_lightPower = ((m_morninglightIntensity - m_lightIntensityAtNight) * m_x + m_lightIntensityAtNight) / m_lightIntensityAtMidDay;
         }
         else if (hour >= m_morningPoint && hour < 12)
         {
             minutsNow = m_hourInMinuts * (hour - m_sunRiseTime) + m_dayTime.Minute();
-            x = minutsNow / ((12 - m_sunRiseTime) * m_hourInMinuts);
-            y = -0.3f * (x - 1) * (x - 1) + 1;
-            m_lightIntensity = (m_lightIntensityAtMidDay - m_lightIntensityAtNight) * y + m_lightIntensityAtNight;
-            m_sunAngle = 90 * x;
-            //Debug.Log("morning time ,x = " + x + ", m_light.intensity=" + m_light.intensity);
+            m_x = minutsNow / ((12 - m_sunRiseTime) * m_hourInMinuts);
+            m_y = -0.3f * (m_x - 1) * (m_x - 1) + 1;
+            m_lightPower = ((m_lightIntensityAtMidDay - m_lightIntensityAtNight) * m_y + m_lightIntensityAtNight)/ m_lightIntensityAtMidDay;
         }
         else if (hour >= 12 && hour < m_afternoonPoint)
         {
             minutsNow = m_hourInMinuts * (hour - 12) + m_dayTime.Minute();
-            x = minutsNow / (m_afternoonMinuts1 + m_afternoonMinuts2);
-            y = -0.3f * (x) * (x) + 1;
-            m_lightIntensity = (m_lightIntensityAtMidDay - m_lightIntensityAtNight) * y + m_lightIntensityAtNight;
-            m_sunAngle = 90 * x + 90;
-            //Debug.Log("afternoon time , m_light.intensity=" + m_light.intensity);
+            m_x = minutsNow / (m_afternoonMinuts1 + m_afternoonMinuts2);
+            m_y = -0.3f * (m_x) * (m_x) + 1;
+            m_lightPower = ((m_lightIntensityAtMidDay - m_lightIntensityAtNight) * m_y + m_lightIntensityAtNight)/ m_lightIntensityAtMidDay;
         }
         else if (hour >= m_afternoonPoint && hour < m_sunSetTime)
         {
             minutsNow = m_hourInMinuts * (hour - m_afternoonPoint) + m_dayTime.Minute();
-            x = minutsNow / (m_afternoonMinuts2);
-            m_lightIntensity = m_afternoonlightIntensity - (m_afternoonlightIntensity - m_lightIntensityAtNight) * x;
-            minutsNow = m_hourInMinuts * (hour - 12) + m_dayTime.Minute();
-            m_sunAngle = 90 * minutsNow / (m_afternoonMinuts2 + m_afternoonMinuts1) + 90;
-            //Debug.Log("afternoon time , m_light.intensity=" + m_light.intensity);
+            m_x = minutsNow / (m_afternoonMinuts2);
+            m_lightPower = (m_afternoonlightIntensity - (m_afternoonlightIntensity - m_lightIntensityAtNight) * m_x) / m_lightIntensityAtMidDay;
         }
     }
 }

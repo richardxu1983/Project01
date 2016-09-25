@@ -74,7 +74,7 @@ public class GameDayTime {
 
     public string TimeString()
     {
-        return m_year + " year, " + m_month + " month" + "\n" + m_day + " day, " + m_hour + " hour, " + m_minute + " minuts";
+        return m_year + " year, " + m_month + " month" + "\n" + m_day + " day, " + m_hour.ToString("d2") + ":" + m_minute.ToString("d2");
     }
 
     //
