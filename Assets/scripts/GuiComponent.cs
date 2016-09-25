@@ -6,27 +6,33 @@ public class GuiComponent : MonoBehaviour {
     public GUISkin guiSkin; // choose a guiStyle (Important!)
 
     public string text = "Player Name"; // choose your name
-
     public Color color = Color.white;   // choose font color/size
-    public float fontSize = 10;
-    public float offsetX = 0;
+
+    public int fontSize = 10;
+    //public float offsetX = 0;
     public float offsetY = 0.5f;
 
-    float boxW = 150f;
-    float boxH = 20f;
-
+    //float boxW = 150f;
+    //float boxH = 20f;
+    Vector3 vec;
+    Rect rect;
+    Vector2 content;
     public bool messagePermanent = true;
-
     public float messageDuration { get; set; }
-
     Vector2 boxPosition;
+
     void Start()
     {
         if (messagePermanent)
         {
             messageDuration = 1;
         }
+
+        vec = new Vector3(0f,0f,0f);
+        rect = new Rect();
+        content = new Vector2();
     }
+
     void OnGUI()
     {
         if (messageDuration > 0)
@@ -37,17 +43,23 @@ public class GuiComponent : MonoBehaviour {
             }
 
             GUI.skin = guiSkin;
-            boxPosition = Camera.main.WorldToScreenPoint(transform.position);
+
+            vec.Set(transform.position.x, transform.position.y, transform.position.z - offsetY * gameObject.GetComponent<MeshFilter>().mesh.bounds.size.y);
+            //print(gameObject.GetComponent<MeshFilter>().mesh.bounds.size + " , " +transform.position+" , "+ vec);
+
+            boxPosition = Camera.main.WorldToScreenPoint(vec);
             boxPosition.y = Screen.height - boxPosition.y;
-            boxPosition.x -= boxW * 0.1f;
-            boxPosition.y -= boxH * 0.5f;
-            guiSkin.box.fontSize = 10;
+            boxPosition.x -= 50 * 0.5f;
+            //boxPosition.y -= boxH * 0.5f;
+            guiSkin.box.fontSize = fontSize;
 
             GUI.contentColor = color;
 
-            Vector2 content = guiSkin.box.CalcSize(new GUIContent(text));
+            content = (guiSkin.box.CalcSize(new GUIContent(text)));
 
-            GUI.Box(new Rect(boxPosition.x - content.x / 2 * offsetX, boxPosition.y + offsetY, content.x, content.y), text);
+            rect.Set(boxPosition.x, boxPosition.y, content.x, content.y);
+
+            GUI.Box(rect, text);
         }
     }
 }
