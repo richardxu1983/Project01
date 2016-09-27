@@ -87,6 +87,17 @@ public class SunLight  {
     //
     public void SunMove()
     {
+        //太阳位置计算
+        SunPosCal();
+
+        //太阳光强度计算
+        SunLightPowerCal();
+    }
+
+
+    //
+    void SunPosCal()
+    {
         float hour = m_dayTime.Hour();
         float minute = m_dayTime.Minute();
 
@@ -99,7 +110,7 @@ public class SunLight  {
             m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
             m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
         }
-        else if(hour > 0 && hour < m_sunRiseTime)
+        else if (hour > 0 && hour < m_sunRiseTime)
         {
             m_sunAngle = 6.28f * ((minute + (hour + 24 - m_sunRiseTime) * m_hourInMinuts) / (24 * m_hourInMinuts));
 
@@ -108,19 +119,16 @@ public class SunLight  {
             m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
             m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
         }
-        else if(hour >= m_sunRiseTime && hour < m_sunSetTime)
+        else if (hour >= m_sunRiseTime && hour < m_sunSetTime)
         {
-            m_sunAngle = 3.14f * ((minute + (hour- m_sunRiseTime) * m_hourInMinuts) / (m_totalDayMinutes));
+            m_sunAngle = 3.14f * ((minute + (hour - m_sunRiseTime) * m_hourInMinuts) / (m_totalDayMinutes));
 
             //Debug.Log("hour="+ hour+" , angle=" + (minute + hour * m_hourInMinuts) / (m_totalDayMinutes));
             m_sunPos.z = m_sunDefalutZ;
             m_sunPos.y = 10 * Mathf.Sin(m_sunAngle);
             m_sunPos.x = 10 * Mathf.Cos(m_sunAngle);
         }
-
-        SunLightPowerCal();
     }
-
 
     //
     public void SunLightPowerCal()

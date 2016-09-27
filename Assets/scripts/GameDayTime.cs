@@ -102,4 +102,20 @@ public class GameDayTime {
     {
         return m_minute;
     }
+
+    //
+    public void DebugSetHour(int hour)
+    {
+        m_hour = hour;
+    }
+
+    //
+    public void DebugAddHour(int hour)
+    {
+        m_hour += hour;
+        if(m_hour>=24)
+        {
+            m_hour = 0;
+        }
+    }
 }

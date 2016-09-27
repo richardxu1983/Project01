@@ -41,6 +41,7 @@ public class Env : MonoBehaviour {
         m_sunLight.init();
 
         m_light.intensity = m_sunLight.LightIntensity();
+        m_light.transform.position = m_sunLight.SunPos();
 
         //
         OnChangeMinute();
@@ -49,7 +50,13 @@ public class Env : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        SunMove();
 
+        //for Debug
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            m_dayTime.DebugAddHour(2);
+        }
     }
 
     //This function is called every fixed framerate frame, if the MonoBehaviour is enabled.FixedUpdate should be used instead of Update when dealing with Rigidbody.For example when adding a force to a rigidbody, you have to apply the force every fixed frame inside FixedUpdate instead of every frame inside Update.
@@ -59,9 +66,17 @@ public class Env : MonoBehaviour {
     }
 
     //
-    public GameDayTime Time()
+    public GameDayTime GetTime()
     {
         return m_dayTime;
+    }
+
+    //
+    void SunMove()
+    {
+        m_light.transform.position = Vector3.Lerp(m_light.transform.position, m_sunLight.SunPos(), Time.deltaTime);
+        //print(transform.position + " , " + m_sunLight.SunPos());
+        m_light.transform.LookAt(Vector3.zero);
     }
 
     //分钟变化的时候
@@ -74,9 +89,7 @@ public class Env : MonoBehaviour {
         //m_sunLight.SunLightIntensity();
         m_sunLight.SunMove();
 
-        m_light.transform.position = (m_sunLight.SunPos());
-
-        m_light.transform.LookAt(Vector3.zero);
+        //m_light.transform.position = (m_sunLight.SunPos());
 
         //print(m_dayTime.Hour() + "h : "+m_sunLight.LightPower());
     }
