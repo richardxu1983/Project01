@@ -8,6 +8,8 @@ public class GameDayTime {
     private int m_monthInDays = 15;      //一个月多少天
     private int m_dayInHours = 24;      //一天24小时
     private int m_yearInMonths = 12;    //一年12个月
+    private float m_MinutsInDay;
+    private float m_MinuteNowInDay;
     private int m_year;
     private int m_minute;
     private int m_hour;
@@ -35,8 +37,22 @@ public class GameDayTime {
         m_tick = 0;
         m_day = 1;
         m_month = 1;
-        m_year = 1;
+        m_year = 3001;
         m_hour = m_initHour;
+        m_MinutsInDay = m_dayInHours * m_hourInMinuts;
+        m_MinuteNowInDay = m_minute + m_hour * m_hourInMinuts;
+    }
+
+    //
+    public float MinutsInDay()
+    {
+        return m_MinutsInDay;
+    }
+
+    //
+    public float MinutNow()
+    {
+        return m_MinuteNowInDay;
     }
 
     //Step Tick Time
@@ -47,7 +63,7 @@ public class GameDayTime {
         {
             m_tick = 0;
             m_minute++;
-
+            
             if (m_minute >= m_hourInMinuts)
             {
                 m_minute = 0;
@@ -68,13 +84,14 @@ public class GameDayTime {
                     }
                 }
             }
+            m_MinuteNowInDay = m_minute + m_hour * m_hourInMinuts;
             notifier.Invoke();
         }
     }
 
     public string TimeString()
     {
-        return m_year + " year, " + m_month + " month" + "\n" + m_day + " day, " + m_hour.ToString("d2") + ":" + m_minute.ToString("d2");
+        return m_hour.ToString("d2") + ":" + m_minute.ToString("d2")  + "\n" + m_month + " month - " + m_day + " , " + m_year;
     }
 
     //
