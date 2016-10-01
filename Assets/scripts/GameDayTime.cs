@@ -16,31 +16,58 @@ public class GameDayTime {
     private int m_day;
     private int m_month;
     private int m_tick;
+    private int m_daysInYear;
+    private int m_totalDaysInYear;
 
     public delegate void Notify();
     public event Notify notifier;
 
+    public delegate void NotifyDay();
+    public event NotifyDay DayNotifier;
+
     //
-    public GameDayTime(int minInTick, int hourInMinuts, int initHour, int monthInDays)
+    public GameDayTime(int minInTick, int hourInMinuts, int monthInDays)
     {
         m_minInTick = minInTick;
         m_hourInMinuts = hourInMinuts;
-        m_initHour = initHour;
         m_monthInDays = monthInDays;
-    }
-
-    //
-    //init the time
-    public void initTime()
-    {
         m_minute = 0;
         m_tick = 0;
         m_day = 1;
         m_month = 1;
         m_year = 3001;
-        m_hour = m_initHour;
+        m_totalDaysInYear = m_monthInDays * m_yearInMonths;
         m_MinutsInDay = m_dayInHours * m_hourInMinuts;
+    }
+
+    //
+    public void SetTime(int initHour, int initMonth, int initDay)
+    {
+        m_minute = 0;
+        m_hour = initHour;
+        m_month = initMonth;
+        m_day = initDay;
+        m_day = m_day < 1 ? 1 : m_day;
+        m_day = m_day > m_monthInDays ? m_monthInDays : m_day;
         m_MinuteNowInDay = m_minute + m_hour * m_hourInMinuts;
+        m_daysInYear = m_month * m_monthInDays + m_day;
+    }
+
+    public float monthInDay()
+    {
+        return (float)m_monthInDays;
+    }
+
+    //
+    public float CurrentDayInYear()
+    {
+        return (float)m_daysInYear;
+    }
+
+    //
+    public float TotalDaysInYear()
+    {
+        return (float)m_totalDaysInYear;
     }
 
     //
@@ -82,6 +109,8 @@ public class GameDayTime {
                             m_year++;
                         }
                     }
+                    m_daysInYear = m_month * m_monthInDays + m_day;
+                    DayNotifier.Invoke();
                 }
             }
             m_MinuteNowInDay = m_minute + m_hour * m_hourInMinuts;
