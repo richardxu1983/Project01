@@ -161,7 +161,7 @@ public class Env : MonoBehaviour {
     void RefreshTextUI()
     {
         //刷新界面文字
-        m_timeInfoText.text = m_temperatureNow.ToString("f0") + "C" + "\n" + m_dayTime.TimeString() + "\n" + m_temperatureSunNow.ToString("f1");
+        m_timeInfoText.text = m_temperatureNow.ToString("f0") + "C" + "\n" + m_dayTime.TimeString();// + "\n" + m_temperatureSunNow.ToString("f1");
     }
 
     //
